@@ -92,4 +92,9 @@ app.listen(PORT, () => {
     writePosts(posts);
     res.status(204).send();
   });
+
+// Error-handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
 });
