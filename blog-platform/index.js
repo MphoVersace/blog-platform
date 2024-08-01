@@ -2,9 +2,42 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const path = require("path");
+const { body, validationResult } = require("express-validator");
 
 const app = express();
 const PORT = 6000;
+
+//new blog post with validation
+app.post(
+  "/posts",
+  [
+    body("title").notEmpty().withMessage("Title is required"),
+    body("content").notEmpty().withMessage("Content is required"),
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    fs.readFile(postsFilePath, "utf8", (err, data) => {
+      if (err) {
+        res.status(500).send("Error reading posts file");
+      } else {
+        const posts = JSON.parse(data);
+        const newPost = { id: Date.now().toString(), ...req.body };
+        posts.push(newPost);
+        fs.writeFile(postsFilePath, JSON.stringify(posts), (err) => {
+          if (err) {
+            res.status(500).send("Error writing to posts file");
+          } else {
+            res.status(201).send(newPost);
+          }
+        });
+      }
+    });
+  }
+);
 
 app.use(bodyParser.json());
 
