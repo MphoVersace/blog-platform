@@ -10,7 +10,9 @@ const PORT = 6000;
 const cors = require('cors');
 
 const helmet = require('helmet');
+const morgan = require('morgan');
 
+app.use(morgan('combined'));
 app.use(helmet());
 app.use(cors());
 
