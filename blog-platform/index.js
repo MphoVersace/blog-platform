@@ -111,4 +111,42 @@ app.listen(PORT, () => {
 
     const PORT = process.env.PORT || 6000;
   });
+
+  // adding a comment to the blog post
+  app.post(
+    "/posts/:id/comments",
+    [body("text").notEmpty().withMessage("Comment text is required")],
+    (req, res) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      fs.readFile(postsFilePath, "utf8", (err, data) => {
+        if (err) {
+          res.status(500).send("Error reading posts file");
+        } else {
+          let posts = JSON.parse(data);
+          const post = posts.find((p) => p.id === req.params.id);
+          if (post) {
+            const newComment = {
+              id: Date.now().toString(),
+              text: req.body.text,
+            };
+            post.comments = post.comments || [];
+            post.comments.push(newComment);
+            fs.writeFile(postsFilePath, JSON.stringify(posts), (err) => {
+              if (err) {
+                res.status(500).send("Error writing to posts file");
+              } else {
+                res.status(201).send(newComment);
+              }
+            });
+          } else {
+            res.status(404).send("Post not found");
+          }
+        }
+      });
+    }
+  );
 });
