@@ -9,6 +9,9 @@ const PORT = 6000;
 
 const cors = require('cors');
 
+const helmet = require('helmet');
+
+app.use(helmet());
 app.use(cors());
 
 //new blog post with validation
