@@ -7,12 +7,12 @@ const { body, validationResult } = require("express-validator");
 const app = express();
 const PORT = 6000;
 
-const cors = require('cors');
+const cors = require("cors");
 
-const helmet = require('helmet');
-const morgan = require('morgan');
+const helmet = require("helmet");
+const morgan = require("morgan");
 
-app.use(morgan('combined'));
+app.use(morgan("combined"));
 app.use(helmet());
 app.use(cors());
 
@@ -102,11 +102,13 @@ app.listen(PORT, () => {
     res.status(204).send();
   });
 
-// Error-handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
+  // Error-handling middleware
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send("Something broke!");
 
-  
+    require("dotenv").config();
 
+    const PORT = process.env.PORT || 6000;
+  });
 });
