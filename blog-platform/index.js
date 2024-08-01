@@ -7,6 +7,10 @@ const { body, validationResult } = require("express-validator");
 const app = express();
 const PORT = 6000;
 
+const cors = require('cors');
+
+app.use(cors());
+
 //new blog post with validation
 app.post(
   "/posts",
@@ -97,4 +101,7 @@ app.listen(PORT, () => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send('Something broke!');
+
+  
+
 });
