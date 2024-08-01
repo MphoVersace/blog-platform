@@ -5,7 +5,7 @@ const path = require("path");
 const { body, validationResult } = require("express-validator");
 
 const app = express();
-const PORT = 6000;
+const PORT = 4000;
 
 const cors = require("cors");
 
