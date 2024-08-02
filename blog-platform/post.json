@@ -1,27 +1,23 @@
 [
   {
-    "id": "1",
-    "title": "Bard Vs ChatGTP:Which one is better for coding?",
-    "content": "For programmers, Generative AI offers tangible benefits. It helps with writing and debugging code, making our busy lives a bit easier as a result. But there are now competing tools like ChatGPT and Bard, which begs the question: which one is best for me to use? We compare these tools against each other in the ultimate battle to see which is the most feature-rich tool right now for programming purposes."
+    "id": 1,
+    "title": "18 3-Step Summer Lunches To Make Forever",
+    "content": "Three is a magic number – and it’s how many steps it takes to make these delicious lunches! These tasty dishes are packed with flavorful summer produce and have stolen the hearts of our readers, earning at least 4-star reviews. Add options like our Green Goddess Grain Bowl and Walnut Pesto Pasta Salad to your weekly lunch rotation for a simple and refreshing summer meal!",
+    "image": "https://www.trndigital.com/wp-content/uploads/2024/01/AdobeStock_230441943-1038x576.jpeg",
+    "comments": []
   },
   {
-    "id": "2",
-    "title": "How to become a software developer with no prior experience",
-    "content": "It’s not surprising -- these days the space is so vast with numerous programming languages, form factors, application layers, and business domains to consider that it can be challenging to know where to start."
+    "id": 2,
+    "title": "25 High-Protein Breakfast Recipes to Make Forever",
+    "content": "You might wake up with a smile on your face thinking of these yummy breakfast ideas. Rated with 4- and 5-stars, our readers have been loving these recipes, and we think you will too. Each serving contains at least 15 grams of protein, which helps support healthy digestion, muscle growth and energy production. You’ll want to start your day with tasty options like our Peanut-Ginger Tofu Scramble or High-Protein Peach Muffins for a delicious and nourishing morning meal!",
+    "image": "https://www.eatingwell.com/thmb/2O4Qn91IVkDs316jWp_Z-Yzzq00=/364x242/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/EWL-green-breakfast-sandwich-with-pesto-hero-247-cabef6ec85f74ca58d5a0ecac41eeb0b.jpg",
+    "comments": []
   },
   {
-    "id": "3",
-    "title": "AWS re:Inforce: Take these generative AI and cloud security measures",
-    "content": "The theme of AWS re:Inforce 2024 is security in the age of generative AI. (Shocking, right?)."
-  },
-  {
-    "id": "4",
-    "title": "IT skills you (and your tech teams) need to develop at work",
-    "content": "When tech changes, the skills an organization needs also change. As a technologist, what skills should you prioritize learning to build or boost your tech career."
-  },
-  {
-    "id": "5",
-    "title": "The 10 most in-demand tech skills in 2024 (with skill tests)",
-    "content": "Upskilling is part and parcel with being in tech, but it can be tough to know where to spend your efforts. "
+    "id": 3,
+    "title": "This Crustless Spinach & Goat Cheese Quiche Is As Simple As It Gets",
+    "content": "Let this weekend-worthy quiche elevate your next brunch spread. You’ll love how easy it is to pull together without the fuss of baking and filling a crust. We love the convenience of pre-washed baby spinach, but any dark leafy green, from kale to Swiss chard, can work well in its place.",
+    "image": "https://www.eatingwell.com/thmb/lWnuvRWXJPycYhf2PzORYoQ_IRc=/750x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/EWL-green-breakfast-sandwich-with-pesto-hero-247-cabef6ec85f74ca58d5a0ecac41eeb0b.jpg",
+    "comments": []
   }
 ]
