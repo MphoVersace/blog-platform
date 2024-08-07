@@ -7,14 +7,28 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 require("dotenv").config();
+const multer = require("multer");
 
+// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Set up middleware
 app.use(morgan("combined"));
 app.use(helmet());
 app.use(cors());
 app.use(bodyParser.json());
+
+// Set up multer for image uploads
+const upload = multer({
+  dest: path.join(__dirname, "uploads"), // Directory to save uploaded files
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+});
+
+// Create uploads directory if it doesn't exist
+if (!fs.existsSync(path.join(__dirname, "uploads"))) {
+  fs.mkdirSync(path.join(__dirname, "uploads"));
+}
 
 // Path to posts file
 const postsFilePath = path.join(__dirname, "posts.json");
@@ -122,6 +136,18 @@ app.post(
     }
   }
 );
+
+// Endpoint to upload an image
+app.post("/api/upload", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No file uploaded");
+  }
+  const filePath = `/uploads/${req.file.filename}`;
+  res.json({ filePath });
+});
+
+// Serve static files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Error-handling middleware
 app.use((err, req, res, next) => {
