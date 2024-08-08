@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 
 // Custom CORS configuration for localhost:3000
 const corsOptions = {
-  origin: "https://blog-platform-1.netlify.app",
+  origin: "https://blogs-f-11.netlify.app",
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization",
   credentials: true,
