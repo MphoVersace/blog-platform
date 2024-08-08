@@ -78,7 +78,11 @@ app.post(
   [
     body("title").notEmpty().withMessage("Title is required"),
     body("content").notEmpty().withMessage("Content is required"),
-    body("image").isURL().withMessage("Image URL is required"),
+    // Remove URL validation, but keep the field
+    body("image")
+      .optional()
+      .isString()
+      .withMessage("Image URL should be a string"),
   ],
   (req, res) => {
     const errors = validationResult(req);
