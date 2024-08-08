@@ -7,28 +7,23 @@ const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 require("dotenv").config();
-const multer = require("multer");
 
-// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Set up middleware
 app.use(morgan("combined"));
 app.use(helmet());
-app.use(cors());
 app.use(bodyParser.json());
 
-// Set up multer for image uploads
-const upload = multer({
-  dest: path.join(__dirname, "uploads"), // Directory to save uploaded files
-  limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
-});
+// Custom CORS configuration for localhost:3000
+const corsOptions = {
+  origin: "https://blog-platform-1.netlify.app",
+  methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: "Content-Type,Authorization",
+  credentials: true,
+};
 
-// Create uploads directory if it doesn't exist
-if (!fs.existsSync(path.join(__dirname, "uploads"))) {
-  fs.mkdirSync(path.join(__dirname, "uploads"));
-}
+app.use(cors(corsOptions));
 
 // Path to posts file
 const postsFilePath = path.join(__dirname, "posts.json");
@@ -61,13 +56,13 @@ const getNextCommentId = (comments) => {
 };
 
 // Endpoint to get all posts
-app.get("/api/posts", (req, res) => {
+app.get("/posts", (req, res) => {
   const posts = readPosts();
   res.json(posts);
 });
 
 // Endpoint to get a single post by id
-app.get("/api/posts/:id", (req, res) => {
+app.get("/posts/:id", (req, res) => {
   const posts = readPosts();
   const post = posts.find((p) => p.id === req.params.id);
   if (post) {
@@ -79,7 +74,7 @@ app.get("/api/posts/:id", (req, res) => {
 
 // Endpoint to add a new post with validation
 app.post(
-  "/api/posts",
+  "/posts",
   [
     body("title").notEmpty().withMessage("Title is required"),
     body("content").notEmpty().withMessage("Content is required"),
@@ -104,7 +99,7 @@ app.post(
 );
 
 // Endpoint to delete a post by id
-app.delete("/api/posts/:id", (req, res) => {
+app.delete("/posts/:id", (req, res) => {
   let posts = readPosts();
   posts = posts.filter((p) => p.id !== req.params.id);
   writePosts(posts);
@@ -113,7 +108,7 @@ app.delete("/api/posts/:id", (req, res) => {
 
 // Endpoint to add a comment to a blog post with validation
 app.post(
-  "/api/posts/:id/comments",
+  "/posts/:id/comments",
   [body("text").notEmpty().withMessage("Comment text is required")],
   (req, res) => {
     const errors = validationResult(req);
@@ -136,18 +131,6 @@ app.post(
     }
   }
 );
-
-// Endpoint to upload an image
-app.post("/api/upload", upload.single("image"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).send("No file uploaded");
-  }
-  const filePath = `/uploads/${req.file.filename}`;
-  res.json({ filePath });
-});
-
-// Serve static files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Error-handling middleware
 app.use((err, req, res, next) => {
