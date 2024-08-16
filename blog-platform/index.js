@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const fs = require("fs");
-const path = require("path");
+const mysql = require("mysql2");
 const { body, validationResult } = require("express-validator");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -11,65 +10,46 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// MySQL connection pool
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+// Middleware setup
 app.use(morgan("combined"));
 app.use(helmet());
 app.use(bodyParser.json());
 
-// Custom CORS configuration for localhost:3000
 const corsOptions = {
   origin: "https://blogs-f-11.netlify.app",
   methods: "GET,POST,PUT,DELETE",
   allowedHeaders: "Content-Type,Authorization",
   credentials: true,
 };
-
 app.use(cors(corsOptions));
-
-// Path to posts file
-const postsFilePath = path.join(__dirname, "posts.json");
-
-// Helper functions to read and write posts
-const readPosts = () => {
-  if (!fs.existsSync(postsFilePath)) {
-    return [];
-  }
-  const data = fs.readFileSync(postsFilePath);
-  return JSON.parse(data);
-};
-
-const writePosts = (posts) => {
-  fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
-};
-
-// Helper function to get the next post ID
-const getNextPostId = (posts) => {
-  if (posts.length === 0) return 1;
-  const lastPost = posts[posts.length - 1];
-  return parseInt(lastPost.id) + 1;
-};
-
-// Helper function to get the next comment ID
-const getNextCommentId = (comments) => {
-  if (comments.length === 0) return 1;
-  const lastComment = comments[comments.length - 1];
-  return parseInt(lastComment.id) + 1;
-};
 
 // Endpoint to get all posts
 app.get("/posts", (req, res) => {
-  const posts = readPosts();
-  res.json(posts);
+  pool.query("SELECT * FROM posts", (error, results) => {
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(results);
+  });
 });
 
 // Endpoint to get a single post by id
 app.get("/posts/:id", (req, res) => {
-  const posts = readPosts();
-  const post = posts.find((p) => p.id === req.params.id);
-  if (post) {
-    res.json(post);
-  } else {
-    res.status(404).send("Post not found");
-  }
+  const { id } = req.params;
+  pool.query("SELECT * FROM posts WHERE id = ?", [id], (error, results) => {
+    if (error) return res.status(500).json({ error: error.message });
+    if (results.length === 0) return res.status(404).send("Post not found");
+    res.json(results[0]);
+  });
 });
 
 // Endpoint to add a new post with validation
@@ -78,7 +58,6 @@ app.post(
   [
     body("title").notEmpty().withMessage("Title is required"),
     body("content").notEmpty().withMessage("Content is required"),
-    // Remove URL validation, but keep the field
     body("image")
       .optional()
       .isString()
@@ -86,28 +65,29 @@ app.post(
   ],
   (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
-    }
 
-    const posts = readPosts();
-    const newPost = {
-      id: getNextPostId(posts).toString(),
-      ...req.body,
-      comments: [],
-    };
-    posts.push(newPost);
-    writePosts(posts);
-    res.status(201).json(newPost);
+    const { title, content, image } = req.body;
+    pool.query(
+      "INSERT INTO posts (title, content, image) VALUES (?, ?, ?)",
+      [title, content, image],
+      (error, results) => {
+        if (error) return res.status(500).json({ error: error.message });
+        const newPost = { id: results.insertId, title, content, image };
+        res.status(201).json(newPost);
+      }
+    );
   }
 );
 
 // Endpoint to delete a post by id
 app.delete("/posts/:id", (req, res) => {
-  let posts = readPosts();
-  posts = posts.filter((p) => p.id !== req.params.id);
-  writePosts(posts);
-  res.status(204).send();
+  const { id } = req.params;
+  pool.query("DELETE FROM posts WHERE id = ?", [id], (error, results) => {
+    if (error) return res.status(500).json({ error: error.message });
+    res.status(204).send();
+  });
 });
 
 // Endpoint to add a comment to a blog post with validation
@@ -116,23 +96,20 @@ app.post(
   [body("text").notEmpty().withMessage("Comment text is required")],
   (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
-    }
 
-    const posts = readPosts();
-    const post = posts.find((p) => p.id === req.params.id);
-    if (post) {
-      const newComment = {
-        id: getNextCommentId(post.comments).toString(),
-        text: req.body.text,
-      };
-      post.comments.push(newComment);
-      writePosts(posts);
-      res.status(201).json(newComment);
-    } else {
-      res.status(404).send("Post not found");
-    }
+    const { id } = req.params;
+    const { text } = req.body;
+    pool.query(
+      "INSERT INTO comments (post_id, text) VALUES (?, ?)",
+      [id, text],
+      (error, results) => {
+        if (error) return res.status(500).json({ error: error.message });
+        const newComment = { id: results.insertId, post_id: id, text };
+        res.status(201).json(newComment);
+      }
+    );
   }
 );
 
